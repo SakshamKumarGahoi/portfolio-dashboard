@@ -77,12 +77,6 @@ export async function fetchGoogleFinanceData(
 
     const html = await response.text();
 
-    /*
-     * Google Finance returns a full HTML page.
-     *
-     * Remove scripts/styles/tags so we can work with
-     * the human-readable text.
-     */
     const text = html
       .replace(
         /<script[\s\S]*?<\/script>/gi,
@@ -98,15 +92,6 @@ export async function fetchGoogleFinanceData(
       .replace(/\s+/g, " ")
       .trim();
 
-    /*
-     * Current Google Finance pages expose:
-     *
-     * P/E ratio 14.05
-     * EPS ₹51.21
-     *
-     * We extract the value immediately following
-     * each label.
-     */
     const peMatch = text.match(
       /P\/E ratio\s+([0-9]+(?:\.[0-9]+)?)/i
     );

@@ -19,9 +19,6 @@ const CACHE_KEY = "portfolio-live";
 const CACHE_TTL = 15_000;
 
 export async function GET() {
-  /*
-   * Check server-side cache first.
-   */
   const cachedPortfolio =
     getCache<Stock[]>(CACHE_KEY);
 
@@ -43,9 +40,7 @@ export async function GET() {
   const portfolio =
     portfolioData as Stock[];
 
-  /*
-   * Fetch all stocks concurrently.
-   */
+  
   const updatedPortfolio =
     await Promise.all(
       portfolio.map(async (stock) => {
@@ -69,36 +64,23 @@ export async function GET() {
               }),
         ]);
 
-        /*
-         * Yahoo fallback.
-         */
+        
         const finalCmp =
           cmp ?? stock.cmp;
 
-        /*
-         * Calculate Present Value.
-         *
-         * Present Value = CMP × Quantity
-         */
+        
         const presentValue =
           finalCmp !== null
             ? finalCmp * stock.quantity
             : stock.presentValue;
 
-        /*
-         * Calculate Gain/Loss.
-         *
-         * Gain/Loss =
-         * Present Value - Investment
-         */
+        
         const gainLoss =
           presentValue !== null
             ? presentValue - stock.investment
             : stock.gainLoss;
 
-        /*
-         * Google fallback.
-         */
+        
         const peRatio =
           googleData.peRatio ??
           stock.peRatio;
@@ -123,10 +105,7 @@ export async function GET() {
       })
     );
 
-  /*
-   * Store the completed portfolio
-   * for 15 seconds.
-   */
+  
   setCache(
     CACHE_KEY,
     updatedPortfolio,
