@@ -1308,7 +1308,7 @@ export default function Home() {
                       {!collapsed && (
                         <div className="overflow-x-auto">
                           <table className="w-full min-w-287.5 text-sm">
-                            <thead className="sticky top-18.25 z-10 bg-[#10282d] text-left text-[10px] uppercase tracking-[0.12em] text-[#718a90]">
+                            <thead className="top-18.25 z-10 bg-[#10282d] text-left text-[10px] uppercase tracking-[0.12em] text-[#718a90]">
                               <tr>
                                 <th className="px-6 py-3">
                                   <button
