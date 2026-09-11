@@ -1,0 +1,140 @@
+import { NextResponse } from "next/server";
+
+import portfolioData from "@/data/portfolio.json";
+
+import {
+  fetchYahooCMP,
+  fetchGoogleFinanceData,
+} from "@/lib/marketData";
+
+import {
+  getCache,
+  setCache,
+} from "@/lib/cache";
+
+import type { Stock } from "@/types/portfolio";
+
+const CACHE_KEY = "portfolio-live";
+
+const CACHE_TTL = 15_000;
+
+export async function GET() {
+  /*
+   * Check server-side cache first.
+   */
+  const cachedPortfolio =
+    getCache<Stock[]>(CACHE_KEY);
+
+  if (cachedPortfolio) {
+    console.log(
+      "Returning portfolio from cache"
+    );
+
+    return NextResponse.json({
+      success: true,
+      data: cachedPortfolio,
+    });
+  }
+
+  console.log(
+    "Cache miss - fetching live market data"
+  );
+
+  const portfolio =
+    portfolioData as Stock[];
+
+  /*
+   * Fetch all stocks concurrently.
+   */
+  const updatedPortfolio =
+    await Promise.all(
+      portfolio.map(async (stock) => {
+        const [
+          cmp,
+          googleData,
+        ] = await Promise.all([
+          stock.yahooSymbol
+            ? fetchYahooCMP(
+                stock.yahooSymbol
+              )
+            : Promise.resolve(null),
+
+          stock.googleSymbol
+            ? fetchGoogleFinanceData(
+                stock.googleSymbol
+              )
+            : Promise.resolve({
+                peRatio: null,
+                latestEarnings: null,
+              }),
+        ]);
+
+        /*
+         * Yahoo fallback.
+         */
+        const finalCmp =
+          cmp ?? stock.cmp;
+
+        /*
+         * Calculate Present Value.
+         *
+         * Present Value = CMP × Quantity
+         */
+        const presentValue =
+          finalCmp !== null
+            ? finalCmp * stock.quantity
+            : stock.presentValue;
+
+        /*
+         * Calculate Gain/Loss.
+         *
+         * Gain/Loss =
+         * Present Value - Investment
+         */
+        const gainLoss =
+          presentValue !== null
+            ? presentValue - stock.investment
+            : stock.gainLoss;
+
+        /*
+         * Google fallback.
+         */
+        const peRatio =
+          googleData.peRatio ??
+          stock.peRatio;
+
+        const latestEarnings =
+          googleData.latestEarnings ??
+          stock.latestEarnings;
+
+        return {
+          ...stock,
+
+          cmp: finalCmp,
+
+          presentValue,
+
+          gainLoss,
+
+          peRatio,
+
+          latestEarnings,
+        };
+      })
+    );
+
+  /*
+   * Store the completed portfolio
+   * for 15 seconds.
+   */
+  setCache(
+    CACHE_KEY,
+    updatedPortfolio,
+    CACHE_TTL
+  );
+
+  return NextResponse.json({
+    success: true,
+    data: updatedPortfolio,
+  });
+}

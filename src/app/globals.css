@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-playfair: 'Playfair Display', serif;
+
+  --background: #eaf5f9;
+  --card: #0c2024;
+  --card-soft: #112a2f;
+  --text: #eef8fa;
+  --muted: #8da4aa;
+  --accent: #8de4f2;
+  --positive: #63d471;
+  --negative: #f07878;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-inter);
+  background: var(--background);
+  color: #0c2024;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.font-display {
+  font-family: var(--font-playfair);
+}
+
+/* Scrollbars */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #78939a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #55747b;
+}
+
+/* Selection */
+
+::selection {
+  background: #8de4f2;
+  color: #0c2024;
+}
+
+/* Number transitions */
+
+.number-transition {
+  transition:
+    color 300ms ease,
+    transform 300ms ease;
+}
+
+/* Hide scrollbar while keeping scrolling */
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile tap behaviour */
+
+@media (max-width: 768px) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
